@@ -3,8 +3,6 @@ import { getCountryDays } from '../../api/covid19api';
 import { DayOneCountryDto } from '../../api/dto';
 
 export interface CountryDays {
-    name: string;
-    isoCode: string;
     days: CountryDay[]
 }
 
@@ -15,14 +13,22 @@ export interface CountryDay {
 }
 
 interface CountryDaysState {
-    [isoCode: string]: CountryDays;
+    [slug: string]: CountryDays;
+}
+
+interface CountryDaysResponse {
+    slug: string,
+    dtos: DayOneCountryDto[]
 }
 
 const initialState: CountryDaysState = {};
 
-export const fetchCountryDays = createAsyncThunk<DayOneCountryDto[], string>(
+export const fetchCountryDays = createAsyncThunk<CountryDaysResponse, string>(
     'countryDays/fetchCountryDays',
-    async (slug: string) => (await getCountryDays(slug)).data
+    async (slug: string) => ({
+        slug: slug,
+        dtos: (await getCountryDays(slug)).data
+    })
 );
 
 const adapter: (dto: DayOneCountryDto) => CountryDay = (dto) => ({
@@ -36,21 +42,15 @@ const slice = createSlice({
     initialState: initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchCountryDays.fulfilled, (state: CountryDaysState, action: PayloadAction<DayOneCountryDto[]>) => {
-            let isoCode = action.payload[0]?.CountryCode;
-            return isoCode !== undefined 
-            ? {
+        builder.addCase(fetchCountryDays.fulfilled, (state: CountryDaysState, action: PayloadAction<CountryDaysResponse>) =>
+            ({
                 ...state,
-                [isoCode]: ({ 
-                    name: action.payload[0].Country,
-                    isoCode: isoCode,
-                    days: action.payload.map(adapter) 
+                [action.payload.slug]: ({
+                    days: action.payload.dtos.map(adapter)
                 })
-            }
-            : state;
-        })
-    }
-});    
+            }));
+        }
+    });
 
 export const countryDaysReducer = slice.reducer;
 export const { actions } = slice;
