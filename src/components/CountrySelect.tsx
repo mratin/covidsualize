@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from "react-redux";
 import { fetchCountries } from '../store/countries/countries.slice';
+import { fetchCountryDays } from '../store/countryDays/countryDays.slice';
 import { AppDispatch, RootState } from '../store/store';
 
 const mapState = (state: RootState) => ({
@@ -8,7 +9,8 @@ const mapState = (state: RootState) => ({
 });
 
 const mapDispatch = (dispatch: AppDispatch) => ({
-    fetchCountries: () => dispatch(fetchCountries())
+    fetchCountries: () => dispatch(fetchCountries()),
+    fetchCountryDays: (slug: string) => dispatch(fetchCountryDays(slug))
 });
 
 const connector = connect(mapState, mapDispatch);

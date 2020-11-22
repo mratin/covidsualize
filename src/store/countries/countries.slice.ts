@@ -5,6 +5,7 @@ import { CountryDto } from '../../api/dto';
 export interface Country {
     name: string;
     isoCode: string;
+    slug: string;
 }
 
 interface CountryState {
@@ -34,7 +35,7 @@ const slice = createSlice({
         }));
         builder.addCase(fetchCountries.fulfilled, (state: CountryState, action: PayloadAction<CountryDto[]>) => ({
             ...state, 
-            countries: action.payload.map(dto => ({name: dto.Country, isoCode: dto.ISO2 })),
+            countries: action.payload.map(dto => ({name: dto.Country, isoCode: dto.ISO2, slug: dto.Slug })),
             loading: 'succeeded'
         }));
         builder.addCase(fetchCountries.rejected, (state: CountryState, ) => ({
