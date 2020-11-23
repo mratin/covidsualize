@@ -4,7 +4,9 @@ import { DayOneCountryDto } from '../../api/dto';
 import * as _ from 'lodash';
 
 export interface CountryDays {
-    days: CountryDay[]
+    days: CountryDay[],
+    totalCases: number,
+    totalDeaths: number
 }
 
 export interface CountryDay {
@@ -59,19 +61,22 @@ const countryDaysAdapter: (days: CountryDay[]) => CountryDay[] = (days) => {
     }
 };
 
-
 const slice = createSlice({
     name: 'countryDays',
     initialState: initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchCountryDays.fulfilled, (state: CountryDaysState, action: PayloadAction<CountryDaysResponse>) =>
-            ({
+        builder.addCase(fetchCountryDays.fulfilled, (state: CountryDaysState, action: PayloadAction<CountryDaysResponse>) => {
+            const days = countryDaysAdapter(action.payload.dtos.map(dayOneCountryDtoAdapter));
+            return {
                 ...state,
                 [action.payload.slug]: ({
-                    days: countryDaysAdapter(action.payload.dtos.map(dayOneCountryDtoAdapter))
+                    days: days,
+                    totalDeaths: days[0]?.totalDeaths ?? 0,
+                    totalCases: days[0]?.totalCases ?? 0
                 })
-            }));
+            };
+        });
     }
 });
 
