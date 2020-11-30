@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { getCountries } from '../../api/covid19api';
 import { CountryDto } from '../../api/dto';
+import { countryPopulations } from '../../data/countryPopulations';
 
 export interface Country {
     name: string;
     isoCode: string;
     slug: string;
+    population: number | undefined
 }
 
 interface CountryState {
@@ -28,22 +30,27 @@ const slice = createSlice({
     initialState: initialState,
     reducers: {},
     extraReducers: (builder) => {
-        builder.addCase(fetchCountries.pending, (state: CountryState, ) => ({
-            ...state, 
+        builder.addCase(fetchCountries.pending, (state: CountryState,) => ({
+            ...state,
             countries: [],
             loading: 'pending',
         }));
         builder.addCase(fetchCountries.fulfilled, (state: CountryState, action: PayloadAction<CountryDto[]>) => ({
-            ...state, 
-            countries: action.payload.map(dto => ({name: dto.Country, isoCode: dto.ISO2, slug: dto.Slug })),
+            ...state,
+            countries: action.payload.map(dto => ({
+                name: dto.Country,
+                isoCode: dto.ISO2,
+                slug: dto.Slug,
+                population: countryPopulations[dto.ISO2]?.population
+            })),
             loading: 'succeeded'
         }));
-        builder.addCase(fetchCountries.rejected, (state: CountryState, ) => ({
+        builder.addCase(fetchCountries.rejected, (state: CountryState,) => ({
             ...state,
             loading: 'failed'
         }));
     }
-});    
+});
 
 export const countriesReducer = slice.reducer;
 export const { actions } = slice;

@@ -1,25 +1,34 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { SectorId } from '../sectors/sectors.slice';
 
-interface Sector {
-    name: string,
-    countryCodes: string[]
-}
-
-interface SelectionState {
-    sectors: Sector[];
+export interface SelectionState {
+    sectorIds: SectorId[],
+    comparisonMode: boolean,
+    normalize: boolean
 }
 
 const initialState: SelectionState = {
-    sectors: []
+    sectorIds: [],
+    comparisonMode: true,
+    normalize: false
 };
 
 const slice = createSlice({
     name: 'selection',
     initialState: initialState,
     reducers: {
-        setSelection: (state: SelectionState, action: PayloadAction<Sector[]>) => ({
-            sectors: action.payload
-        })        
+        selectSectors: (state: SelectionState, action: PayloadAction<SectorId[]>) => ({
+            ...state,
+            sectorIds: action.payload
+        }),
+        selectComparisonMode: (state: SelectionState, action: PayloadAction<boolean>) => ({
+            ...state,
+            comparisonMode: action.payload
+        }),
+        selectNormalize: (state: SelectionState, action: PayloadAction<boolean>) => ({
+            ...state,
+            normalize: action.payload
+        })
     },
 });    
 

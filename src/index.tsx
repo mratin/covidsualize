@@ -8,11 +8,9 @@ import App from './components/App';
 
 function renderApp() {
   ReactDOM.render(
-    <React.StrictMode>
-      <Provider store={store}>
+    <Provider store={store}>
       <App />
-      </Provider>
-    </React.StrictMode>,
+    </Provider>,
     document.getElementById('root')
   );
 }

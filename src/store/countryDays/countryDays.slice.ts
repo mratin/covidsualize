@@ -72,8 +72,8 @@ const slice = createSlice({
                 ...state,
                 [action.payload.slug]: ({
                     days: days,
-                    totalDeaths: days[0]?.totalDeaths ?? 0,
-                    totalCases: days[0]?.totalCases ?? 0
+                    totalDeaths: days[days.length-1]?.totalDeaths ?? 0,
+                    totalCases: days[days.length-1]?.totalCases ?? 0
                 })
             };
         });
