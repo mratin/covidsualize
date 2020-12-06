@@ -32,7 +32,7 @@ const countryDays = [
     }];
 
 test('data set', () => {
-    let actual = toDataPoints(3, countryDays);
+    let actual = toDataPoints(3, countryDays, 1);
     console.log("Actual: " + actual);
     expect(actual).toEqual([
         {

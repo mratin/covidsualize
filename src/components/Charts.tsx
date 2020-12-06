@@ -53,9 +53,11 @@ class Charts extends Component<Props> {
 
         let dataCharts: DataChart[][] = sectors.map((sector, i) => {
             let countryDays = this.props.countryDaysState[sector.countries[0].slug];
-            if (countryDays !== undefined) {
+            const population = sector.population
+            if (countryDays !== undefined && population !== undefined) {
+                let normalizeBy = this.props.selectionState.normalize ? 1e6 / population : 1
                 let dataPoints: Map<string, DataPoint> =
-                    new Map(toDataPoints(roll, countryDays.days).map(dataPoint => [toDateString(dataPoint.t), dataPoint]))
+                    new Map(toDataPoints(roll, countryDays.days, normalizeBy).map(dataPoint => [toDateString(dataPoint.t), dataPoint]))
                 return this.createDataCharts(sector.name, colors[i % colors.length], dataPoints)
             } else {
                 return []

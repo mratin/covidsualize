@@ -30,38 +30,39 @@ export const emptyDataPoint: (m: moment.Moment) => DataPoint = (t: moment.Moment
 
 const average = (xs: number[]) => xs.filter(x => isFinite(x)).reduce((a, b) => a + b, 0) / xs.length
 
-export const toDataPoints: (roll: number, days: CountryDay[]) => DataPoint[] = (roll: number, days: CountryDay[]) => {
-    let dataPoints: DataPoint[] = days.map(d => ({        
-        t: moment(d.dateTime),
-        newCases: d.newCases,
-        newDeaths: d.newDeaths,
-        totalCases: d.totalCases,
-        totalDeaths: d.totalDeaths,
-        rollingCases: undefined,
-        rollingDeaths: undefined
-    }));
+export const toDataPoints: (roll: number, days: CountryDay[], normalizeBy: number) => DataPoint[] =
+    (roll: number, days: CountryDay[], normalizeBy: number) => {
+        let dataPoints: DataPoint[] = days.map(d => ({
+            t: moment(d.dateTime),
+            newCases: d.newCases * normalizeBy,
+            newDeaths: d.newDeaths * normalizeBy,
+            totalCases: d.totalCases * normalizeBy,
+            totalDeaths: d.totalDeaths * normalizeBy,
+            rollingCases: undefined,
+            rollingDeaths: undefined
+        }));
 
-    let daysByDate: Map<moment.Moment, DataPoint> = new Map(dataPoints.map(d => [d.t, d]));
-    let dates: moment.Moment[] = _.sortBy(Array.from(daysByDate.keys()), (m: moment.Moment) => m.valueOf())
+        let daysByDate: Map<moment.Moment, DataPoint> = new Map(dataPoints.map(d => [d.t, d]));
+        let dates: moment.Moment[] = _.sortBy(Array.from(daysByDate.keys()), (m: moment.Moment) => m.valueOf())
 
-    return dates.map((m, i) => {
-        let currentDay: DataPoint = daysByDate.get(m) || emptyDataPoint(m);
-        
-        let rollingDates = dates.slice(Math.max(i - Math.floor(roll / 2), 0), i + Math.ceil(roll / 2))
+        return dates.map((m, i) => {
+            let currentDay: DataPoint = daysByDate.get(m) || emptyDataPoint(m);
 
-        let rolling = (f: (t: DataPoint) => number) => {
-            let rollingValues = rollingDates.map(m => f(daysByDate.get(m) || emptyDataPoint(m)))
-            return Math.round(average(rollingValues))
-        }
+            let rollingDates = dates.slice(Math.max(i - Math.floor(roll / 2), 0), i + Math.ceil(roll / 2))
 
-        let rollingDefined = rollingDates.length == roll
-        let rollingCases = rollingDefined ? rolling(d => d.newCases) : undefined
-        let rollingDeaths = rollingDefined ? rolling(d => d.newDeaths) : undefined
+            let rolling = (f: (t: DataPoint) => number) => {
+                let rollingValues = rollingDates.map(m => f(daysByDate.get(m) || emptyDataPoint(m)))
+                return average(rollingValues)
+            }
 
-        return ({
-            ...currentDay,
-            rollingCases: rollingCases,
-            rollingDeaths: rollingDeaths
-        })
-    });
-};
+            let rollingDefined = rollingDates.length == roll
+            let rollingCases = rollingDefined ? rolling(d => d.newCases) : undefined
+            let rollingDeaths = rollingDefined ? rolling(d => d.newDeaths) : undefined
+
+            return ({
+                ...currentDay,
+                rollingCases: rollingCases,
+                rollingDeaths: rollingDeaths
+            })
+        });
+    };
