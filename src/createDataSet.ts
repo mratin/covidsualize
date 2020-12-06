@@ -55,7 +55,7 @@ export const toDataPoints: (roll: number, days: CountryDay[], normalizeBy: numbe
                 return average(rollingValues)
             }
 
-            let rollingDefined = rollingDates.length == roll
+            let rollingDefined = rollingDates.length === roll
             let rollingCases = rollingDefined ? rolling(d => d.newCases) : undefined
             let rollingDeaths = rollingDefined ? rolling(d => d.newDeaths) : undefined
 

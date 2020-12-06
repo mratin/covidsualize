@@ -7,6 +7,10 @@ import * as _ from 'lodash';
 import { AppBar, Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Toolbar } from '@material-ui/core';
 import { actions as sectorsActions, Sector, SectorId } from '../store/sectors/sectors.slice';
 import { actions as selectionActions } from '../store/selection/selection.slice';
+import { DateRange } from 'moment-range';
+import moment from 'moment';
+import MomentUtils from '@date-io/moment';
+import { KeyboardDatePicker, MuiPickersUtilsProvider } from '@material-ui/pickers';
 
 const COUNTRY_DAYS_DELAY = 250;
 
@@ -23,7 +27,8 @@ const mapDispatch = (dispatch: AppDispatch) => ({
     setSectors: (sectors: Sector[]) => dispatch(sectorsActions.setSectors(sectors)),
     selectSectors: (sectorIds: SectorId[]) => dispatch(selectionActions.selectSectors(sectorIds)),
     selectNormalize: (normalize: boolean) => dispatch(selectionActions.selectNormalize(normalize)),
-    selectComparisonMode: (comparisonMode: boolean) => dispatch(selectionActions.selectComparisonMode(comparisonMode))
+    selectComparisonMode: (comparisonMode: boolean) => dispatch(selectionActions.selectComparisonMode(comparisonMode)),
+    selectRange: (range: DateRange) => dispatch(selectionActions.selectRange(range))
 });
 
 const connector = connect(mapState, mapDispatch);
@@ -31,16 +36,6 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 type Props = PropsFromRedux;
 
 class CountrySelect extends Component<Props> {
-    // loadCountriesDays() {
-    //     const slugToLoad: string | undefined = _.shuffle(this.props.countriesState.countries)
-    //         .find(c => this.props.countryDaysState[c.slug] === undefined)?.slug;
-
-    //     if (slugToLoad !== undefined) {
-    //         this.props.fetchCountryDays(slugToLoad)
-    //             .then(() => setTimeout(() => this.loadCountriesDays(), COUNTRY_DAYS_DELAY));
-    //     }
-    // }
-
     loadCountriesDays() {
         let countries: Country[] = this.props.selectionState.sectorIds.flatMap(sectorId => this.props.sectorsState[sectorId]?.countries)
         let notLoadedCountry: Country | undefined = _.shuffle(countries).find(country => this.props.countryDaysState[country.slug] === undefined)
@@ -72,8 +67,6 @@ class CountrySelect extends Component<Props> {
     }
 
     componentDidMount() {
-        //this.props.fetchCountries().then(() => this.loadCountriesDays());
-
         this.loadSectors()
     }
 
@@ -93,57 +86,90 @@ class CountrySelect extends Component<Props> {
 
     render() {
         return (
-            <AppBar color="default" position="sticky">
-                <Toolbar>
-                    <Box mr={4}>
-                        <FormControl>
-                            <InputLabel id="select-country"></InputLabel>
-                            <Select
-                                style={{ minWidth: 96 }}
-                                multiple={this.props.selectionState.comparisonMode}
-                                labelId="select-country"
-                                id="select-country"
-                                value={this.selectedSectorValue()}
-                                onChange={(e) => {
-                                    if (this.props.selectionState.comparisonMode) {
-                                        this.selectSectors(e.target.value as string[])
-                                    } else {
-                                        this.selectSectors([e.target.value as string])
-                                    }
+            <MuiPickersUtilsProvider utils={MomentUtils}>
+                <AppBar color="default" position="sticky">
+                    <Toolbar>
+                        <Box mr={4}>
+                            <FormControl>
+                                <InputLabel id="select-country"></InputLabel>
+                                <Select
+                                    style={{ minWidth: 96 }}
+                                    multiple={this.props.selectionState.comparisonMode}
+                                    labelId="select-country"
+                                    id="select-country"
+                                    value={this.selectedSectorValue()}
+                                    onChange={(e) => {
+                                        if (this.props.selectionState.comparisonMode) {
+                                            this.selectSectors(e.target.value as string[])
+                                        } else {
+                                            this.selectSectors([e.target.value as string])
+                                        }
+                                    }}
+                                >
+                                    {this.sectorsValues().map(sector =>
+                                        <MenuItem key={sector.id} value={sector.id}>{sector.name}</MenuItem>
+                                    )}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                        <Box>
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        disabled={false}
+                                        checked={this.props.selectionState.normalize}
+                                        onChange={(e) => this.props.selectNormalize(e.target.checked)}
+                                        name="normalized"
+                                        color="primary"
+                                    />}
+                                label="Per 1M Population"
+                            />
+                            <FormControlLabel
+                                control={
+                                    <Checkbox
+                                        disabled={false}
+                                        checked={this.props.selectionState.comparisonMode}
+                                        onChange={(e) => this.props.selectComparisonMode(e.target.checked)}
+                                        name="enableMultiple"
+                                        color="primary"
+                                    />}
+                                label="Comparison Mode"
+                            />
+                        </Box>
+                        <Box>
+                            <KeyboardDatePicker
+                                disableToolbar
+                                variant="inline"
+                                format="yyyy-MM-DD"
+                                margin="normal"
+                                id="from-picker"
+                                label="From Date"
+                                value={this.props.selectionState.range.start.toDate()}
+                                onChange={(date) => {
+                                    const currentRange = this.props.selectionState.range
+                                    this.props.selectRange(new DateRange(moment.min(moment(date), currentRange.end), currentRange.end));
                                 }}
-                            >
-                                {this.sectorsValues().map(sector =>
-                                    <MenuItem key={sector.id} value={sector.id}>{sector.name}</MenuItem>
-                                )}
-                            </Select>
-                        </FormControl>
-                    </Box>
-                    <Box>
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    disabled={false}
-                                    checked={this.props.selectionState.normalize}
-                                    onChange={(e) => this.props.selectNormalize(e.target.checked)}
-                                    name="normalized"
-                                    color="primary"
-                                />}
-                            label="Per 1M Population"
-                        />
-                        <FormControlLabel
-                            control={
-                                <Checkbox
-                                    disabled={false}
-                                    checked={this.props.selectionState.comparisonMode}
-                                    onChange={(e) => this.props.selectComparisonMode(e.target.checked)}
-                                    name="enableMultiple"
-                                    color="primary"
-                                />}
-                            label="Comparison Mode"
-                        />
-                    </Box>
-                </Toolbar>
-            </AppBar>)
+                            />
+                        </Box>
+                        <Box>
+                            <KeyboardDatePicker
+                                disableToolbar
+                                variant="inline"
+                                format="yyyy-MM-DD"
+                                margin="normal"
+                                id="to-picker"
+                                label="To Date"
+                                value={this.props.selectionState.range.end.toDate()}
+                                onChange={(date) => {
+                                    const currentRange = this.props.selectionState.range
+                                    this.props.selectRange(new DateRange(currentRange.start, moment.max(moment(date), currentRange.start)));
+                                }}
+                            />
+                        </Box>
+                    </Toolbar>
+                </AppBar>
+            </MuiPickersUtilsProvider>
+        )
     }
 }
 

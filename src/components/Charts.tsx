@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, FormControl, Paper, Select, Toolbar } from '@material-ui/core';
+import { Paper } from '@material-ui/core';
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { colors, Color } from '../colors';
@@ -9,9 +9,8 @@ import { Sector } from '../store/sectors/sectors.slice';
 import { AppDispatch, RootState } from '../store/store';
 import './App.css';
 import { ChartDataSet, CoronaChart } from './Chart';
-import SelectBar from './SelectBar';
 import * as Moment from 'moment';
-import { extendMoment, DateRange } from 'moment-range';
+import { extendMoment } from 'moment-range';
 
 const moment = extendMoment(Moment);
 
@@ -38,10 +37,9 @@ type Props = PropsFromRedux;
 
 const toDateString = (moment: moment.Moment) => moment.format('YYYY-MM-DD');
 
-
 class Charts extends Component<Props> {
 
-    private dateRange = () => moment.range(moment('2020-01-01T00:00:00Z'), moment('2020-12-31T00:00:00Z'));
+    private dateRange = () => this.props.selectionState.range;
     private dates = () => Array.from(this.dateRange().by('day')).map(d => toDateString(d));
 
     private createAllDataCharts(): DataChart[][] {

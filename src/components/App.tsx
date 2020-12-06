@@ -1,4 +1,4 @@
-import { AppBar, Box, Container, FormControl, Select, Toolbar } from '@material-ui/core';
+import { Box, Container } from '@material-ui/core';
 import React, { Component } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { fetchCountries } from '../store/countries/countries.slice';
