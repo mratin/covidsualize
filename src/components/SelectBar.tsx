@@ -84,6 +84,8 @@ class CountrySelect extends Component<Props> {
         return _.sortBy(Object.values(this.props.sectorsState), ['name']);
     }
 
+    getCurrentRange = () => new DateRange(moment(this.props.selectionState.rangeFrom), moment(this.props.selectionState.rangeTo))
+
     render() {
         return (
             <MuiPickersUtilsProvider utils={MomentUtils}>
@@ -144,9 +146,9 @@ class CountrySelect extends Component<Props> {
                                 margin="normal"
                                 id="from-picker"
                                 label="From Date"
-                                value={this.props.selectionState.range.start.toDate()}
+                                value={moment(this.props.selectionState.rangeFrom).toDate()}
                                 onChange={(date) => {
-                                    const currentRange = this.props.selectionState.range
+                                    const currentRange = this.getCurrentRange()
                                     this.props.selectRange(new DateRange(moment.min(moment(date), currentRange.end), currentRange.end));
                                 }}
                             />
@@ -159,9 +161,9 @@ class CountrySelect extends Component<Props> {
                                 margin="normal"
                                 id="to-picker"
                                 label="To Date"
-                                value={this.props.selectionState.range.end.toDate()}
+                                value={moment(this.props.selectionState.rangeTo).toDate()}
                                 onChange={(date) => {
-                                    const currentRange = this.props.selectionState.range
+                                    const currentRange = this.getCurrentRange()
                                     this.props.selectRange(new DateRange(currentRange.start, moment.max(moment(date), currentRange.start)));
                                 }}
                             />

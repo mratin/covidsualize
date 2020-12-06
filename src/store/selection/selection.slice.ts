@@ -7,14 +7,16 @@ export interface SelectionState {
     sectorIds: SectorId[],
     comparisonMode: boolean,
     normalize: boolean,
-    range: DateRange
+    rangeFrom: string,
+    rangeTo: string
 }
 
 const initialState: SelectionState = {
     sectorIds: [],
     comparisonMode: false,
     normalize: false,
-    range: new DateRange(moment('2020-01-01T00:00:00Z'), moment())
+    rangeFrom: moment('2020-01-01T00:00:00Z').toISOString(),
+    rangeTo: moment().toISOString()
 };
 
 const slice = createSlice({
@@ -35,7 +37,8 @@ const slice = createSlice({
         }),
         selectRange: (state: SelectionState, action: PayloadAction<DateRange>) => ({
             ...state,
-            range: action.payload
+            rangeFrom: action.payload.start.toISOString(),
+            rangeTo: action.payload.end.toISOString()
         })
     },
 });    

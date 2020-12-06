@@ -10,7 +10,7 @@ import { AppDispatch, RootState } from '../store/store';
 import './App.css';
 import { ChartDataSet, CoronaChart } from './Chart';
 import * as Moment from 'moment';
-import { extendMoment } from 'moment-range';
+import { DateRange, extendMoment } from 'moment-range';
 
 const moment = extendMoment(Moment);
 
@@ -39,7 +39,7 @@ const toDateString = (moment: moment.Moment) => moment.format('YYYY-MM-DD');
 
 class Charts extends Component<Props> {
 
-    private dateRange = () => this.props.selectionState.range;
+    private dateRange = () => new DateRange(moment(this.props.selectionState.rangeFrom), moment(this.props.selectionState.rangeTo));
     private dates = () => Array.from(this.dateRange().by('day')).map(d => toDateString(d));
 
     private createAllDataCharts(): DataChart[][] {
