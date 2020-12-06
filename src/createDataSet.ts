@@ -18,7 +18,7 @@ export interface DataPoint {
     rollingDeaths: number | undefined
 }
 
-const emptyDataPoint: (m: moment.Moment) => DataPoint = (t: moment.Moment) => ({
+export const emptyDataPoint: (m: moment.Moment) => DataPoint = (t: moment.Moment) => ({
     t: t,
     newCases: 0,
     newDeaths: 0,

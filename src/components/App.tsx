@@ -5,6 +5,7 @@ import { fetchCountries } from '../store/countries/countries.slice';
 import { fetchCountryDays } from '../store/countryDays/countryDays.slice';
 import { AppDispatch, RootState } from '../store/store';
 import './App.css';
+import Charts from './Charts';
 import SelectBar from './SelectBar';
 
 const mapState = (state: RootState) => ({
@@ -27,6 +28,9 @@ class App extends Component<Props> {
         return (
             <Container maxWidth="xl">
                 <SelectBar></SelectBar>
+                <Box marginTop={4}>
+                <Charts/>
+                </Box>
             </Container>
         )
     }

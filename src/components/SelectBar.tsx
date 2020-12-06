@@ -4,7 +4,7 @@ import { Country, fetchCountries } from '../store/countries/countries.slice';
 import { fetchCountryDays } from '../store/countryDays/countryDays.slice';
 import { AppDispatch, RootState } from '../store/store';
 import * as _ from 'lodash';
-import { AppBar, Box, FormControl, InputLabel, MenuItem, Select, Toolbar } from '@material-ui/core';
+import { AppBar, Box, Checkbox, FormControl, FormControlLabel, InputLabel, MenuItem, Select, Toolbar } from '@material-ui/core';
 import { actions as sectorsActions, Sector, SectorId } from '../store/sectors/sectors.slice';
 import { actions as selectionActions } from '../store/selection/selection.slice';
 
@@ -21,7 +21,9 @@ const mapDispatch = (dispatch: AppDispatch) => ({
     fetchCountries: () => dispatch(fetchCountries()),
     fetchCountryDays: (slug: string) => dispatch(fetchCountryDays(slug)),
     setSectors: (sectors: Sector[]) => dispatch(sectorsActions.setSectors(sectors)),
-    selectSectors: (sectorIds: SectorId[]) => dispatch(selectionActions.selectSectors(sectorIds))
+    selectSectors: (sectorIds: SectorId[]) => dispatch(selectionActions.selectSectors(sectorIds)),
+    selectNormalize: (normalize: boolean) => dispatch(selectionActions.selectNormalize(normalize)),
+    selectComparisonMode: (comparisonMode: boolean) => dispatch(selectionActions.selectComparisonMode(comparisonMode))
 });
 
 const connector = connect(mapState, mapDispatch);
@@ -115,6 +117,30 @@ class CountrySelect extends Component<Props> {
                                 )}
                             </Select>
                         </FormControl>
+                    </Box>
+                    <Box>
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    disabled={false}
+                                    checked={this.props.selectionState.normalize}
+                                    onChange={(e) => this.props.selectNormalize(e.target.checked)}
+                                    name="normalized"
+                                    color="primary"
+                                />}
+                            label="Per 1M Population"
+                        />
+                        <FormControlLabel
+                            control={
+                                <Checkbox
+                                    disabled={false}
+                                    checked={this.props.selectionState.comparisonMode}
+                                    onChange={(e) => this.props.selectComparisonMode(e.target.checked)}
+                                    name="enableMultiple"
+                                    color="primary"
+                                />}
+                            label="Comparison Mode"
+                        />
                     </Box>
                 </Toolbar>
             </AppBar>)
