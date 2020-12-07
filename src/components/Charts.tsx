@@ -43,14 +43,14 @@ class Charts extends Component<Props> {
     private dates = () => Array.from(this.dateRange().by('day')).map(d => toDateString(d));
 
     private createAllDataCharts(): DataChart[][] {
-        const roll = 7; // TODO make configurable
+        const roll = 7;
 
         let sectors: Sector[] = this.props.selectionState.sectorIds
             .map(sectorId => this.props.sectorsState[sectorId])
-            .filter(sector => sector !== undefined);
+            .filter(sector => sector !== undefined)
 
         let dataCharts: DataChart[][] = sectors.map((sector, i) => {
-            let countryDays = this.props.countryDaysState[sector.countries[0].slug];
+            let countryDays = this.props.countryDaysState[sector.countries[0].slug]; // TODO support 
             const population = sector.population
             if (countryDays !== undefined && population !== undefined) {
                 let normalizeBy = this.props.selectionState.normalize ? 1e6 / population : 1

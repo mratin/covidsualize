@@ -29,7 +29,8 @@ const slice = createSlice({
         }),
         selectComparisonMode: (state: SelectionState, action: PayloadAction<boolean>) => ({
             ...state,
-            comparisonMode: action.payload
+            comparisonMode: action.payload,
+            sectorIds: action.payload ? state.sectorIds : state.sectorIds.slice(0,1)
         }),
         selectNormalize: (state: SelectionState, action: PayloadAction<boolean>) => ({
             ...state,
