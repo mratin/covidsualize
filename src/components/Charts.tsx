@@ -83,7 +83,7 @@ class Charts extends Component<Props> {
                     ]
                 },
                 {
-                    title: `New Deaths`,
+                    title: `New Deaths (rolling avg)`,
                     datasets: [
                         {
                             title: title,
