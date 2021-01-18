@@ -43,7 +43,7 @@ class Charts extends Component<Props> {
     private dates = () => Array.from(this.dateRange().by('day')).map(d => toDateString(d));
 
     private createAllDataCharts(): DataChart[][] {
-        const roll = 7;
+        const roll = this.props.selectionState.roll;
 
         let sectors: Sector[] = this.props.selectionState.sectorIds
             .map(sectorId => this.props.sectorsState[sectorId])

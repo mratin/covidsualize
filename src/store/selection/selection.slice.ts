@@ -8,7 +8,8 @@ export interface SelectionState {
     comparisonMode: boolean,
     normalize: boolean,
     rangeFrom: string,
-    rangeTo: string
+    rangeTo: string,
+    roll: number
 }
 
 const initialState: SelectionState = {
@@ -16,7 +17,8 @@ const initialState: SelectionState = {
     comparisonMode: false,
     normalize: false,
     rangeFrom: moment('2020-01-01T00:00:00Z').toISOString(),
-    rangeTo: moment().toISOString()
+    rangeTo: moment().toISOString(),
+    roll: 7
 };
 
 const slice = createSlice({
@@ -40,6 +42,10 @@ const slice = createSlice({
             ...state,
             rangeFrom: action.payload.start.toISOString(),
             rangeTo: action.payload.end.toISOString()
+        }),
+        selectRoll: (state: SelectionState, action: PayloadAction<number>) => ({
+            ...state,
+            roll: action.payload
         })
     },
 });    
